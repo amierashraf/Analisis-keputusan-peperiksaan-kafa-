@@ -3,7 +3,8 @@ const SHEETS = {
   'Tahun 1': { gid: '1976884325' },
   'Tahun 2': { gid: '810678928' },
   'Tahun 3': { gid: '177173064' },
-  'Tahun 4': { gid: '879145108' }
+  'Tahun 4': { gid: '879145108' },
+  'Tahun 5': { gid: '1419236165' }
 };
 
 let currentClass = 'Tahun 1';
