@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keputusan Peperiksaan KAFA Akhir Tahun 2026</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo-area">
+        <div class="logo-circle">KAFA</div>
+        <div>
+          <h1>Keputusan Peperiksaan KAFA</h1>
+          <h2>Akhir Tahun 2026</h2>
+        </div>
+      </div>
+      <p class="school-name" id="schoolName">KAFA Sekolah Kebangsaan Paloh Hinai</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="controls">
+      <div class="class-selector">
+        <h3>Pilih Kelas / Tahun</h3>
+        <div class="class-buttons" id="classButtons">
+          <button data-class="Tahun 1" class="active">Tahun 1</button>
+          <button data-class="Tahun 2">Tahun 2</button>
+          <button data-class="Tahun 3">Tahun 3</button>
+          <button data-class="Tahun 4">Tahun 4</button>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Cari nama pelajar..." autocomplete="off">
+      </div>
+
+      <div class="action-buttons">
+        <button id="printClassBtn" class="btn-primary">Cetak Keputusan Kelas</button>
+        <button id="refreshBtn" class="btn-secondary">Muat Semula Data</button>
+      </div>
+    </section>
+
+    <section class="info-bar" id="infoBar">
+      <span id="examDate">Tarikh: 11 - 16 November 2026</span>
+      <span id="classTeacher">Guru Kelas: -</span>
+    </section>
+
+    <section class="table-container" id="tableContainer">
+      <div class="loading" id="loading">Memuatkan data...</div>
+      <table id="resultsTable" style="display:none;">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div id="noResults" style="display:none;" class="no-results">Tiada data dijumpai.</div>
+    </section>
+  </main>
+
+  <!-- Individual Report Modal -->
+  <div id="reportModal" class="modal">
+    <div class="modal-content" id="reportContent">
+      <span class="close-modal">&times;</span>
+      <div id="individualReport"></div>
+      <div class="modal-actions">
+        <button id="printIndividualBtn" class="btn-primary">Cetak Slip Individu</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Data diambil secara langsung daripada Google Sheets. Perubahan oleh admin akan dipaparkan selepas muat semula.</p>
+    <p>© 2026 KAFA Sekolah Kebangsaan Paloh Hinai</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
