@@ -3,7 +3,8 @@ const SHEETS = {
   'Tahun 1': { gid: '1976884325' },
   'Tahun 2': { gid: '810678928' },
   'Tahun 3': { gid: '177173064' },
-  'Tahun 4': { gid: '879145108' }
+  'Tahun 4': { gid: '879145108' },
+  'Tahun 5': { gid: 'PLACEHOLDER_GID' } // Sila ganti dengan GID sheet Tahun 5 apabila sudah dicipta
 };
 
 let currentClass = 'Tahun 1';
@@ -18,11 +19,13 @@ const resultsTable = document.getElementById('resultsTable');
 const loading = document.getElementById('loading');
 const noResults = document.getElementById('noResults');
 const printClassBtn = document.getElementById('printClassBtn');
+const shareClassBtn = document.getElementById('shareClassBtn');
 const refreshBtn = document.getElementById('refreshBtn');
 const reportModal = document.getElementById('reportModal');
 const individualReport = document.getElementById('individualReport');
 const closeModal = document.querySelector('.close-modal');
 const printIndividualBtn = document.getElementById('printIndividualBtn');
+const shareIndividualBtn = document.getElementById('shareIndividualBtn');
 
 // Subject abbreviations for table header
 const SUBJECTS = [
@@ -38,7 +41,13 @@ const SUBJECTS = [
 async function fetchSheet(className) {
   if (allData[className]) return allData[className];
 
-  const gid = SHEETS[className].gid;
+  const sheetConfig = SHEETS[className];
+  if (!sheetConfig || sheetConfig.gid === 'PLACEHOLDER_GID') {
+    alert(`Sheet untuk ${className} belum diwujudkan. Sila cipta tab baru dalam Google Sheet dan kemaskini GID dalam kod.`);
+    return { students: [], school: 'KAFA Sekolah Kebangsaan Paloh Hinai', examDate: '-' };
+  }
+
+  const gid = sheetConfig.gid;
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
   
   try {
@@ -241,6 +250,9 @@ function showIndividualReport(name) {
           <div class="line">Tandatangan Guru Kelas</div>
         </div>
         <div>
+          <div class="line">Tandatangan Ibu Bapa / Penjaga</div>
+        </div>
+        <div>
           <div class="line">Tandatangan Guru Besar</div>
         </div>
       </div>
@@ -319,11 +331,90 @@ window.addEventListener('click', (e) => {
   }
 });
 
-// Initial load
+// Share functions
+function getShareUrl(className, studentName = null) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('kelas', className);
+  if (studentName) {
+    url.searchParams.set('nama', studentName);
+  } else {
+    url.searchParams.delete('nama');
+  }
+  return url.toString();
+}
+
+async function shareContent(title, text, url) {
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, text, url });
+    } catch (err) {
+      if (err.name !== 'AbortError') copyToClipboard(url);
+    }
+  } else {
+    copyToClipboard(url);
+  }
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Pautan telah disalin! Anda boleh kongsi pautan ini.');
+  }).catch(() => {
+    prompt('Salin pautan ini:', text);
+  });
+}
+
+shareClassBtn.addEventListener('click', () => {
+  const url = getShareUrl(currentClass);
+  shareContent(
+    `Keputusan KAFA ${currentClass}`,
+    `Lihat keputusan peperiksaan KAFA ${currentClass} - Sekolah Kebangsaan Paloh Hinai`,
+    url
+  );
+});
+
+shareIndividualBtn.addEventListener('click', () => {
+  const nameEl = individualReport.querySelector('.student-info div');
+  // Better way: store current student
+  if (window.currentStudent) {
+    const url = getShareUrl(currentClass, window.currentStudent.name);
+    shareContent(
+      `Slip Keputusan ${window.currentStudent.name}`,
+      `Lihat slip keputusan ${window.currentStudent.name} - KAFA ${currentClass}`,
+      url
+    );
+  }
+});
+
+// Update showIndividualReport to store current student
+const originalShow = showIndividualReport;
+showIndividualReport = function(name) {
+  const student = currentStudents.find(s => s.name === name);
+  if (student) window.currentStudent = student;
+  originalShow(name);
+};
+
+// Handle URL parameters on load
+function handleUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const kelas = params.get('kelas');
+  const nama = params.get('nama');
+
+  if (kelas && SHEETS[kelas]) {
+    loadClass(kelas).then(() => {
+      if (nama) {
+        setTimeout(() => showIndividualReport(decodeURIComponent(nama)), 500);
+      }
+    });
+  } else {
+    loadClass('Tahun 1');
+  }
+}
+
+// Replace initial load
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => loadClass('Tahun 1'));
+  document.addEventListener('DOMContentLoaded', handleUrlParams);
 } else {
-  loadClass('Tahun 1');
+  handleUrlParams();
 }
 
 // Small button style
